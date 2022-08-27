@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -13,7 +14,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
@@ -34,6 +37,23 @@ public class AddItemActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_item);
 
         Mapping();
+        // set onClick button Add item
+        btnAdd.setOnClickListener(View ->{
+            /**convert data imageView -> byte[]*/
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) imgViewNoPhoto.getDrawable();
+            Bitmap bitmap = bitmapDrawable.getBitmap();
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG,100,byteArrayOutputStream);
+            byte[] image = byteArrayOutputStream.toByteArray();
+
+            MainActivity.database.INSERT_ITEM(
+                    edtNameItem.getText().toString().trim(),
+                    edtDescription.getText().toString().trim(),
+                    image
+            );
+            Toast.makeText(this, "Added!", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(AddItemActivity.this,MainActivity.class));
+        });
         // set onClick button Camera
         imgBtnCamera.setOnClickListener(View -> {
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
